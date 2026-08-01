@@ -1,8 +1,8 @@
 (function () {
     // --- Rate Limiting for XposedOrNot ---
     let breachTimestamps = [];
-    const BREACH_WINDOW = 10000; // 10 seconds[cite: 2]
-    const BREACH_MAX = 3; // Max 3 requests[cite: 2]
+    const BREACH_WINDOW = 10000; // 10 seconds
+    const BREACH_MAX = 3; // Max 3 requests
 
     // --- Helper Functions ---
 
@@ -98,49 +98,49 @@
         if (!args) return print("Usage: ad breached <email or phone>");
 
         const now = Date.now();
-        breachTimestamps = breachTimestamps.filter(t => now - t < BREACH_WINDOW);[cite: 2]
+        breachTimestamps = breachTimestamps.filter(t => now - t < BREACH_WINDOW);
 
         if (breachTimestamps.length >= BREACH_MAX) {
-            return print("Rate limit reached. Try again in a few seconds.");[cite: 2]
+            return print("Rate limit reached. Try again in a few seconds.");
         }
 
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args);[cite: 2]
-        const phone = args.replace(/\D/g,'');[cite: 2]
-        const isPhone = phone.length >= 7;[cite: 2]
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args);
+        const phone = args.replace(/\D/g,'');
+        const isPhone = phone.length >= 7;
 
         if (!isEmail && !isPhone) {
-            return print("Invalid email or phone format.");[cite: 2]
+            return print("Invalid email or phone format.");
         }
 
-        breachTimestamps.push(now);[cite: 2]
+        breachTimestamps.push(now);
         print(`Checking breach records for <span class='cmd'>${args}</span>...`, true);
 
         try {
             let endpoint = isEmail 
-                ? `https://api.xposedornot.com/v1/check-email/${encodeURIComponent(args)}`[cite: 2]
-                : `https://api.xposedornot.com/v1/check-phone/${encodeURIComponent(phone)}`;[cite: 2]
+                ? `https://api.xposedornot.com/v1/check-email/${encodeURIComponent(args)}`
+                : `https://api.xposedornot.com/v1/check-phone/${encodeURIComponent(phone)}`;
 
-            let r = await fetch(endpoint);[cite: 2]
+            let r = await fetch(endpoint);
 
             if (r.status === 404) {
-                return print("No breaches found.");[cite: 2]
+                return print("No breaches found.");
             }
 
-            let j = await r.json();[cite: 2]
+            let j = await r.json();
 
             if (!j.breaches || j.breaches.length === 0) {
-                print("No breaches found.");[cite: 2]
+                print("No breaches found.");
             } else {
                 print("<hr>", true);
-                print(`<b>Breaches detected: ${j.breaches.length}</b>`, true);[cite: 2]
+                print(`<b>Breaches detected: ${j.breaches.length}</b>`, true);
                 j.breaches.forEach(b => {
-                    print(`* <span class='danger-text'>${b.breach}</span> <span class='dim'>(${b.exposed_data})</span>`, true);[cite: 2]
+                    print(`* <span class='danger-text'>${b.breach}</span> <span class='dim'>(${b.exposed_data})</span>`, true);
                 });
                 print("<hr>", true);
             }
 
         } catch {
-            print("<span class='danger-text'>Lookup failed. API unreachable or blocked by CORS.</span>", true);[cite: 2]
+            print("<span class='danger-text'>Lookup failed. API unreachable or blocked by CORS.</span>", true);
         }
     }
 
@@ -263,5 +263,5 @@
         adrenalineHandler
     );
 
-    console.log("[adrenaline] OSINT Plugin (with XposedOrNot support) loaded.");
+    console.log("[adrenaline] OSINT Plugin loaded.");
 })();
